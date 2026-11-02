@@ -6,6 +6,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { copyFileSync, mkdirSync } from "node:fs";
+import { createRequire } from "node:module";
 import { join } from "node:path";
 
 const root = import.meta.dirname;
@@ -15,20 +16,24 @@ const nodeExe =
 const build = join(root, "build");
 mkdirSync(build, { recursive: true });
 
+// 直接调用本地 CLI 入口，避免 Windows 上 npx.cmd 无法用 execFile 启动的问题
+const require = createRequire(import.meta.url);
+const esbuildCli = require.resolve("esbuild/bin/esbuild");
+const postjectCli = require.resolve("postject/dist/cli.js");
 const run = (cmd, args) => execFileSync(cmd, args, { cwd: root, stdio: "inherit" });
 
 console.log("[1/4] 打包脚本");
-run("npx", ["esbuild", "src/main.mjs", "--bundle", "--platform=node", "--format=cjs", "--target=node20", "--outfile=build/dict-converter.cjs"]);
+run(process.execPath, [esbuildCli, "src/main.mjs", "--bundle", "--platform=node", "--format=cjs", "--target=node20", "--outfile=build/dict-converter.cjs"]);
 
 console.log("[2/4] 生成 SEA blob");
-run("node", ["--experimental-sea-config", "sea-config.json"]);
+run(process.execPath, ["--experimental-sea-config", "sea-config.json"]);
 
 console.log("[3/4] 复制 node.exe");
 copyFileSync(nodeExe, join(build, "dict-converter.exe"));
 
 console.log("[4/4] 注入 blob");
-run("npx", [
-  "postject",
+run(process.execPath, [
+  postjectCli,
   join("build", "dict-converter.exe"),
   "NODE_SEA_BLOB",
   join("build", "sea-prep.blob"),
