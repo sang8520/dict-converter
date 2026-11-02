@@ -1,0 +1,19 @@
+{
+  "name": "dict-converter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "把 MDict .mdx 转成英语学习应用可导入的 .dictpack.zip",
+  "type": "module",
+  "scripts": {
+    "build:bundle": "esbuild src/main.mjs --bundle --platform=node --format=cjs --target=node20 --outfile=build/dict-converter.cjs",
+    "build:sea": "node --experimental-sea-config sea-config.json"
+  },
+  "dependencies": {
+    "js-mdict": "7.0.0",
+    "fflate": "^0.8.3"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "postject": "^1.0.0-alpha.6"
+  }
+}

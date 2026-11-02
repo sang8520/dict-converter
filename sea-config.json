@@ -1,0 +1,5 @@
+{
+  "main": "build/dict-converter.cjs",
+  "output": "build/sea-prep.blob",
+  "disableExperimentalSEAWarning": true
+}
